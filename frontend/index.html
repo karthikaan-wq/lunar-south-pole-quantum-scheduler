@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lunar South Pole Mission Scheduler</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <header>
+    <h1>Lunar South Pole Mission Scheduler</h1>
+    <p>Mission planning and communication visibility dashboard</p>
+    <div class="mock-banner">DEMO MODE — MOCK DATA ONLY</div>
+  </header>
+
+  <main>
+
+    <!-- Landing Screen -->
+    <section id="screen-landing" class="screen active">
+      <h2>Plan Your Lunar Mission</h2>
+      <p>Explore mission locations, assign assets, and view simulated mission results.</p>
+      <button id="btn-open-dashboard">Open Dashboard</button>
+    </section>
+
+    <!-- Dashboard Screen -->
+    <section id="screen-dashboard" class="screen">
+      <h2>Mission Dashboard</h2>
+      <table id="mission-table"></table>
+      <button id="btn-new-mission">Create New Mission</button>
+    </section>
+
+    <!-- Mission Configuration -->
+    <section id="screen-config" class="screen">
+      <h2>Mission Configuration</h2>
+
+      <label>Number of Landers
+        <input id="config-landers" type="number" min="0" max="5" value="2">
+      </label>
+
+      <label>Number of Rovers
+        <input id="config-rovers" type="number" min="0" max="10" value="3">
+      </label>
+
+      <label>Number of Orbiters
+        <input id="config-orbiters" type="number" value="0" disabled>
+      </label>
+
+      <label>Mission Date
+        <input id="config-date" type="date">
+      </label>
+
+      <label>Start Time
+        <input id="config-time" type="time" value="00:00">
+      </label>
+
+      <label>Mission Duration (days)
+        <input id="config-duration" type="number" min="1" value="7">
+      </label>
+
+      <label>Minimum Earth Elevation (degrees)
+        <input id="config-minel" type="number" min="0" max="90" value="10">
+      </label>
+
+      <label>Region
+        <select id="config-region"></select>
+      </label>
+
+      <div id="config-errors" class="errors"></div>
+
+      <button id="btn-back-dashboard">Back</button>
+      <button id="btn-config-next">Next: Assign Locations</button>
+    </section>
+
+    <!-- Asset Assignment -->
+    <section id="screen-assets" class="screen">
+      <h2>Asset Location Assignment</h2>
+      <div id="asset-list"></div>
+      <button id="btn-assets-back">Back</button>
+      <button id="btn-generate" disabled>Generate Mission Results</button>
+    </section>
+
+    <!-- Processing Screen -->
+    <section id="screen-processing" class="screen">
+      <h2>Processing Mission</h2>
+      <div class="progress-container">
+        <div id="progress-bar"></div>
+      </div>
+      <p id="progress-text">Preparing simulation...</p>
+    </section>
+
+    <!-- Results Screen -->
+    <section id="screen-results" class="screen">
+      <h2>Mission Results</h2>
+      <div id="summary"></div>
+
+      <h3>Earth Elevation Over Time</h3>
+      <canvas id="earth-chart" width="800" height="300"></canvas>
+
+      <h3>Communication Windows</h3>
+      <table id="comm-table"></table>
+
+      <h3>Sunlight Windows</h3>
+      <table id="sun-table"></table>
+
+      <button id="btn-new-from-results">Create Another Mission</button>
+    </section>
+
+  </main>
+
+  <script src="mock-data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

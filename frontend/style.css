@@ -1,0 +1,123 @@
+body {
+  font-family: system-ui, sans-serif;
+  margin: 0;
+  background: #f6f6f3;
+  color: #1d1d1b;
+}
+
+header {
+  background: #1d2a3a;
+  color: white;
+  padding: 12px 20px;
+}
+
+header h1 {
+  margin: 0;
+  font-size: 1.3rem;
+}
+
+.banner {
+  margin-top: 6px;
+  padding: 4px 8px;
+  background: #fff3c4;
+  color: #5a4600;
+  font-size: 0.85rem;
+  display: inline-block;
+}
+
+main {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 20px 16px 48px;
+}
+
+label {
+  display: block;
+  margin: 10px 0;
+}
+
+input,
+select {
+  padding: 6px;
+  margin-left: 8px;
+}
+
+.row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin: 8px 0;
+}
+
+.row label {
+  width: 90px;
+  margin: 0;
+}
+
+.row select {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+}
+
+button {
+  padding: 8px 14px;
+  margin: 12px 8px 0 0;
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 10px 0;
+  font-size: 14px;
+}
+
+th,
+td {
+  border: 1px solid #ccc;
+  padding: 4px 8px;
+  text-align: left;
+}
+
+.errors {
+  color: #b00020;
+}
+
+.cards {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.card {
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 10px 14px;
+}
+
+.progress {
+  background: #ddd;
+  height: 18px;
+  border-radius: 9px;
+  overflow: hidden;
+}
+
+#progress-bar {
+  background: #2f5d8a;
+  height: 100%;
+  width: 0%;
+  transition: width 0.4s;
+}
+
+canvas {
+  max-width: 100%;
+  background: white;
+  border: 1px solid #ddd;
+}
