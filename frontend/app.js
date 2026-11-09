@@ -2,7 +2,8 @@
 const state = {
   config: null,
   assets: [],
-  results: null
+  results: null,
+  catalog: MOCK_CATALOG
 };
 
 const el = (id) => document.getElementById(id);
@@ -173,7 +174,7 @@ function refreshAssetOptions() {
         (id) => id !== asset.locationId
       );
 
-      const options = MOCK_CATALOG.filter(
+      const options =  state.catalog.filter(
         (c) =>
           c.type === asset.type &&
           !takenByOthers.includes(c.id)
@@ -213,45 +214,63 @@ el("btn-assets-back").onclick = () => {
   showScreen("screen-config");
 };
 
-// ---------- PROCESSING SCREEN ----------
-const PROCESSING_STEPS = [
-  "Loading mission settings",
-  "Calculating Earth geometry (mock)",
-  "Checking terrain obstruction (mock)",
-  "Finding communication windows (mock)",
-  "Finding sunlight windows (mock)",
-  "Preparing results"
-];
+ // ---------- PROCESSING SCREEN ----------
 
-el("btn-generate").onclick = () => {
+el("btn-generate").onclick = async () => {
+  const button = el("btn-generate");
+
+  button.disabled = true;
+
   showScreen("screen-processing");
 
-  let step = 0;
+  el("progress-bar").style.width = "10%";
+  el("progress-text").textContent =
+    "Submitting mission configuration...";
 
-  el("progress-bar").style.width = "0%";
+  try {
+    if (API_ENABLED) {
+      el("progress-bar").style.width = "40%";
+      el("progress-text").textContent =
+        "Generating demonstration results through FastAPI...";
 
-  const timer = setInterval(() => {
-    el("progress-bar").style.width =
-      Math.round(((step + 1) / PROCESSING_STEPS.length) * 100) + "%";
+      const apiData = await apiGenerateMission(
+        state.config,
+        state.assets
+      );
 
-    el("progress-text").textContent = PROCESSING_STEPS[step];
+      state.results = normalizeApiResults(apiData);
 
-    step++;
-
-    if (step === PROCESSING_STEPS.length) {
-      clearInterval(timer);
+    } else {
+      el("progress-bar").style.width = "60%";
+      el("progress-text").textContent =
+        "Generating local demonstration results...";
 
       state.results = makeMockResults(
         state.config,
         state.assets
       );
 
-      setTimeout(() => {
-        renderResults();
-        showScreen("screen-results");
-      }, 400);
+      state.results.source = "mock";
+      state.results.warning =
+        "Local demonstration data only. Not real lunar predictions.";
     }
-  }, 600);
+
+    el("progress-bar").style.width = "100%";
+    el("progress-text").textContent = "Preparing results...";
+
+    renderResults();
+    showScreen("screen-results");
+
+  } catch (error) {
+    console.error("Mission generation failed:", error);
+
+    alert("Mission generation failed: " + error.message);
+
+    showScreen("screen-assets");
+
+  } finally {
+    refreshAssetOptions();
+  }
 };
 
 // ---------- RESULTS ----------
@@ -310,8 +329,8 @@ function drawEarthChart() {
 
   ctx.clearRect(0, 0, W, H);
 
-  const minEl = -10;
-  const maxEl = 12;
+const minEl = 0;
+const maxEl = 50;
 
   const y = (value) =>
     H - pad - ((value - minEl) / (maxEl - minEl)) * (H - 2 * pad);
@@ -328,7 +347,7 @@ function drawEarthChart() {
   ctx.fillStyle = "#555";
   ctx.font = "12px sans-serif";
 
-  [-10, -5, 0, 5, 10].forEach((v) => {
+ [0, 10, 20, 30, 40, 50].forEach((v) => {
     ctx.beginPath();
     ctx.moveTo(pad, y(v));
     ctx.lineTo(W - 10, y(v));
@@ -378,4 +397,36 @@ el("btn-new-from-results").onclick = () => {
 };
 
 // ---------- START THE WEBSITE ----------
-showScreen("screen-landing");
+
+async function initializeWebsite() {
+  showScreen("screen-landing");
+
+  if (API_ENABLED) {
+    try {
+      const catalogData = await apiGetCatalog();
+
+      const backendAssets = [
+  ...catalogData.landers,
+  ...catalogData.rovers
+];
+
+state.catalog = backendAssets.map((asset) => {
+  const mockLocation = MOCK_CATALOG.find(
+    (location) => location.id === asset.id
+  );
+
+  return {
+    ...mockLocation,
+    ...asset
+  };
+});
+      console.log("Backend catalog loaded:", state.catalog);
+
+    } catch (error) {
+      console.error("Could not load backend catalog:", error);
+      alert("Could not connect to the backend catalog. Please check the server.");
+    }
+  }
+}
+
+initializeWebsite();
