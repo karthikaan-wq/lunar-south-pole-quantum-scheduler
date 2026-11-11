@@ -1,4 +1,5 @@
-// ---------- STATE ----------
+
+ // ---------- STATE ----------
 const state = {
   config: null,
   assets: [],
@@ -8,6 +9,7 @@ const state = {
 
 const el = (id) => document.getElementById(id);
 
+
 // ---------- SCREEN NAVIGATION ----------
 function showScreen(id) {
   document.querySelectorAll(".screen").forEach((s) => {
@@ -16,6 +18,7 @@ function showScreen(id) {
 
   window.scrollTo(0, 0);
 }
+
 
 // ---------- DASHBOARD ----------
 el("btn-open-dashboard").onclick = () => {
@@ -46,6 +49,7 @@ function renderMissions() {
       <th>Created</th>
     </tr>${rows}`;
 }
+
 
 // ---------- MISSION CONFIGURATION ----------
 el("config-region").innerHTML = MOCK_REGIONS.map(
@@ -102,38 +106,108 @@ el("btn-config-next").onclick = () => {
   showScreen("screen-assets");
 };
 
+
 // ---------- ASSET LOCATION ASSIGNMENT ----------
 function buildAssetForm() {
   state.assets = [];
 
+  // Create landers.
   for (let i = 1; i <= state.config.landers; i++) {
     state.assets.push({
-      name: "Lander-" + i,
+      name: "L" + i,
       type: "lander",
       locationId: "",
       assignedLander: ""
     });
   }
 
+  // Create rovers.
   for (let i = 1; i <= state.config.rovers; i++) {
     state.assets.push({
-      name: "Rover-" + i,
+      name: "R" + i,
       type: "rover",
       locationId: "",
       assignedLander: ""
     });
   }
 
+  // Build vertically arranged assignment fields.
   el("asset-list").innerHTML = state.assets.map((a, i) => {
-    const lander = a.type === "rover"
-      ? `<select data-kind="lander" data-index="${i}"></select>`
+    const landerOptions = a.type === "rover"
+      ? `
+        <div style="
+          display: flex;
+          flex-direction: column;
+          width: 100%;
+          min-width: 0;
+          gap: 7px;
+        ">
+          <label style="display: block; margin: 0;">
+            Assign rover to lander
+          </label>
+
+          <select
+            data-kind="lander"
+            data-index="${i}"
+            style="
+              display: block;
+              width: 100%;
+              max-width: 100%;
+              min-width: 0;
+              box-sizing: border-box;
+            "
+          >
+            <option value="">Choose a lander</option>
+          </select>
+        </div>
+      `
       : "";
 
     return `
-      <div class="row">
-        <label>${a.name}</label>
-        <select data-kind="location" data-index="${i}"></select>
-        ${lander}
+      <div class="row" style="
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        width: 100%;
+        min-width: 0;
+        box-sizing: border-box;
+        gap: 14px;
+        margin-bottom: 22px;
+        padding: 16px;
+      ">
+
+        <strong style="display: block;">
+          ${a.type === "rover" ? "Rover " : "Lander "}${a.name}
+        </strong>
+
+        <div style="
+          display: flex;
+          flex-direction: column;
+          width: 100%;
+          min-width: 0;
+          gap: 7px;
+        ">
+          <label style="display: block; margin: 0;">
+            Location Coordinates
+          </label>
+
+          <select
+            data-kind="location"
+            data-index="${i}"
+            style="
+              display: block;
+              width: 100%;
+              max-width: 100%;
+              min-width: 0;
+              box-sizing: border-box;
+            "
+          >
+            <option value="">Choose coordinates</option>
+          </select>
+        </div>
+
+        ${landerOptions}
+
       </div>
     `;
   }).join("");
@@ -145,18 +219,22 @@ function buildAssetForm() {
   refreshAssetOptions();
 }
 
+
+// ---------- HANDLE ASSET CHANGES ----------
 function onAssetChange(event) {
   const index = Number(event.target.dataset.index);
 
   if (event.target.dataset.kind === "location") {
     state.assets[index].locationId = event.target.value;
-  } else {
+  } else if (event.target.dataset.kind === "lander") {
     state.assets[index].assignedLander = event.target.value;
   }
 
   refreshAssetOptions();
 }
 
+
+// ---------- REFRESH LOCATION AND LANDER OPTIONS ----------
 function refreshAssetOptions() {
   const chosenIds = state.assets
     .map((a) => a.locationId)
@@ -169,38 +247,43 @@ function refreshAssetOptions() {
   document.querySelectorAll("#asset-list select").forEach((select) => {
     const asset = state.assets[Number(select.dataset.index)];
 
+    // LOCATION DROPDOWN: coordinates only.
     if (select.dataset.kind === "location") {
       const takenByOthers = chosenIds.filter(
         (id) => id !== asset.locationId
       );
 
-      const options =  state.catalog.filter(
+      const options = state.catalog.filter(
         (c) =>
           c.type === asset.type &&
           !takenByOthers.includes(c.id)
       );
 
       select.innerHTML =
-        `<option value="">Choose a location</option>` +
+        `<option value="">Choose coordinates</option>` +
         options.map((c) => `
           <option value="${c.id}">
-            ${c.id} | lat ${c.lat.toFixed(2)}, lon ${c.lon.toFixed(2)}
-            | Sun ${c.sun_pct.toFixed(0)}%
-            | Earth ${c.earth_pct.toFixed(0)}%
+            Latitude: ${Number(c.lat).toFixed(4)}°,
+            Longitude: ${Number(c.lon).toFixed(4)}°
           </option>
         `).join("");
 
       select.value = asset.locationId;
+    }
 
-    } else {
+    // ROVER-TO-LANDER DROPDOWN.
+    else if (select.dataset.kind === "lander") {
       select.innerHTML =
-        `<option value="">Assigned lander</option>` +
-        landerNames.map((n) => `<option>${n}</option>`).join("");
+        `<option value="">Choose a lander</option>` +
+        landerNames.map((name) => `
+          <option value="${name}">${name}</option>
+        `).join("");
 
       select.value = asset.assignedLander;
     }
   });
 
+  // Check whether all assignments are complete.
   const complete = state.assets.every(
     (a) =>
       a.locationId !== "" &&
@@ -210,12 +293,14 @@ function refreshAssetOptions() {
   el("btn-generate").disabled = !complete;
 }
 
+
+// ---------- BACK BUTTON ----------
 el("btn-assets-back").onclick = () => {
   showScreen("screen-config");
 };
 
- // ---------- PROCESSING SCREEN ----------
 
+// ---------- PROCESSING SCREEN ----------
 el("btn-generate").onclick = async () => {
   const button = el("btn-generate");
 
@@ -273,6 +358,7 @@ el("btn-generate").onclick = async () => {
   }
 };
 
+
 // ---------- RESULTS ----------
 function renderResults() {
   const r = state.results;
@@ -318,6 +404,7 @@ function renderResults() {
     `).join("");
 }
 
+
 // ---------- EARTH ELEVATION CHART ----------
 function drawEarthChart() {
   const canvas = el("earth-chart");
@@ -329,8 +416,8 @@ function drawEarthChart() {
 
   ctx.clearRect(0, 0, W, H);
 
-const minEl = 0;
-const maxEl = 50;
+  const minEl = 0;
+  const maxEl = 50;
 
   const y = (value) =>
     H - pad - ((value - minEl) / (maxEl - minEl)) * (H - 2 * pad);
@@ -347,7 +434,7 @@ const maxEl = 50;
   ctx.fillStyle = "#555";
   ctx.font = "12px sans-serif";
 
- [0, 10, 20, 30, 40, 50].forEach((v) => {
+  [0, 10, 20, 30, 40, 50].forEach((v) => {
     ctx.beginPath();
     ctx.moveTo(pad, y(v));
     ctx.lineTo(W - 10, y(v));
@@ -392,12 +479,13 @@ const maxEl = 50;
   );
 }
 
+
 el("btn-new-from-results").onclick = () => {
   showScreen("screen-config");
 };
 
-// ---------- START THE WEBSITE ----------
 
+// ---------- START THE WEBSITE ----------
 async function initializeWebsite() {
   showScreen("screen-landing");
 
@@ -406,25 +494,29 @@ async function initializeWebsite() {
       const catalogData = await apiGetCatalog();
 
       const backendAssets = [
-  ...catalogData.landers,
-  ...catalogData.rovers
-];
+        ...catalogData.landers,
+        ...catalogData.rovers
+      ];
 
-state.catalog = backendAssets.map((asset) => {
-  const mockLocation = MOCK_CATALOG.find(
-    (location) => location.id === asset.id
-  );
+      state.catalog = backendAssets.map((asset) => {
+        const mockLocation = MOCK_CATALOG.find(
+          (location) => location.id === asset.id
+        );
 
-  return {
-    ...mockLocation,
-    ...asset
-  };
-});
+        return {
+          ...mockLocation,
+          ...asset
+        };
+      });
+
       console.log("Backend catalog loaded:", state.catalog);
 
     } catch (error) {
       console.error("Could not load backend catalog:", error);
-      alert("Could not connect to the backend catalog. Please check the server.");
+
+      alert(
+        "Could not connect to the backend catalog. Please check the server."
+      );
     }
   }
 }
