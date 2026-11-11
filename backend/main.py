@@ -8,6 +8,9 @@ from backend.catalog import get_catalog
 from backend.schemas import MissionRequest
 from backend.validation import validate_mission
 from backend.mock_engine import generate_mock_environment
+from backend.physics.ephemeris import earth_moon_state
+from backend.physics.kernels import KernelsMissing
+from backend.physics.time_system import parse_utc
 from backend.store import (
     new_id,
     save_mission,
@@ -135,6 +138,33 @@ def retrieve_result(result_id: str):
         )
 
     return result
+@app.get("/api/physics/earth-moon")
+def physics_earth_moon(utc: str):
+    """
+    Return real SPICE Earth-Moon astronomical data
+    for the requested UTC timestamp.
+    """
+
+    # Validate and parse the UTC timestamp
+    try:
+        moment = parse_utc(utc)
+
+    except ValueError:
+        raise HTTPException(
+            status_code=422,
+            detail="utc must be a valid ISO timestamp, "
+                   "for example 2026-11-10T00:00:00Z"
+        )
+
+    # Calculate the real astronomical state
+    try:
+        return earth_moon_state(moment)
+
+    except KernelsMissing as error:
+        raise HTTPException(
+            status_code=503,
+            detail=str(error)
+        )
 
 
 # Serve the frontend after registering all API routes.
