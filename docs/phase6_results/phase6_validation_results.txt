@@ -1,0 +1,65 @@
+PHASE 6 VALIDATION RESULTS
+============================================================
+Start UTC: 2026-11-13T00:00:00Z
+Duration: 1.0 days
+Sampling interval: 5.0 minutes
+Expected samples per site: 289
+Aberration correction: NONE
+Horizon model: flat
+
+SITE: Shackleton Rim
+Latitude: -89.9
+Longitude: 129.78
+Height: 0.0 m
+Samples: 289
+Start UTC: 2026-11-13T00:00:00.000
+End UTC: 2026-11-14T00:00:00.000
+Minimum elevation: -5.621102 deg
+Maximum elevation: -4.713839 deg
+Minimum lower limb: -6.522334 deg
+Maximum upper limb: -3.813089 deg
+Centre above horizon samples: 0
+Disc intersects horizon samples: 0
+Disc entirely above horizon samples: 0
+CSV: shackleton_rim_earth_track.csv
+Plot: shackleton_rim_earth_elevation.png
+
+SITE: Malapert Massif
+Latitude: -85.99
+Longitude: 0.12
+Height: 100.0 m
+Samples: 289
+Start UTC: 2026-11-13T00:00:00.000
+End UTC: 2026-11-14T00:00:00.000
+Minimum elevation: -1.548397 deg
+Maximum elevation: -0.640161 deg
+Minimum lower limb: -2.449903 deg
+Maximum upper limb: 0.260863 deg
+Centre above horizon samples: 0
+Disc intersects horizon samples: 77
+Disc entirely above horizon samples: 0
+CSV: malapert_massif_earth_track.csv
+Plot: malapert_massif_earth_elevation.png
+
+SITE: Chandrayaan-3 Landing Site
+Latitude: -69.37
+Longitude: 32.32
+Height: 0.0 m
+Samples: 289
+Start UTC: 2026-11-13T00:00:00.000
+End UTC: 2026-11-14T00:00:00.000
+Minimum elevation: 11.894971 deg
+Maximum elevation: 12.523416 deg
+Minimum lower limb: 10.992564 deg
+Maximum upper limb: 13.425321 deg
+Centre above horizon samples: 289
+Disc intersects horizon samples: 0
+Disc entirely above horizon samples: 289
+CSV: chandrayaan_3_landing_site_earth_track.csv
+Plot: chandrayaan_3_landing_site_earth_elevation.png
+
+============================================================
+PHASE 6 VALIDATION COMPLETED
+Sites tested: 3
+Total samples: 867
+All numerical and tracking checks passed.
