@@ -1,0 +1,2 @@
+site,window_id,start_utc,end_utc,duration_s,available_s,bridged_gap_s,starts_before_period,ends_after_period,clipped,limiting_checks,visible_fraction_mean,visible_fraction_min,visible_fraction_max,clearance_deg_mean,clearance_deg_min,clearance_deg_max,sun_earth_separation_deg_mean,sun_earth_separation_deg_min,sun_earth_separation_deg_max
+Malapert,window_001,2026-11-14T00:00:00Z,2026-11-15T00:00:00Z,86400.0,86400.0,0,True,True,True,,1.0,1.0,1.0,2.93151740704541,2.4288204853386235,3.459838186350166,122.4761352438494,117.09898559387467,127.84760145463184
