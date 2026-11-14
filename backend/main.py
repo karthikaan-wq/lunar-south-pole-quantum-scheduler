@@ -20,6 +20,7 @@ from backend.physics.earth_geometry import (
 
 from backend.terrain.dem_loader import load_dem_terrain
 from backend.terrain.horizon import horizon_profile
+from backend.visibility.routes import router as visibility_router
 
 
 from backend.store import (
@@ -37,6 +38,7 @@ app = FastAPI(
     version="0.1.0",
 )
 
+app.include_router(visibility_router)
 
 app.add_middleware(
     CORSMiddleware,

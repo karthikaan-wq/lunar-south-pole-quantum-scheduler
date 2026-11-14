@@ -1,0 +1,4 @@
+site,latitude_deg,longitude_deg,elevation_m,sample_count,mean_visible_fraction,percent_any_part_visible,percent_centre_visible,percent_fully_visible,percent_blocked,samples_with_incomplete_terrain
+Shackleton Floor Candidate,-89.73391,122.03549,-2843.630792470993,1345,0.0,0.0,0.0,0.0,100.0,0
+Shackleton Rim Candidate,-89.67869,-163.05292,1703.415334704356,1345,0.028810408921933085,13.011152416356877,0.0,0.0,86.98884758364312,0
+Malapert Massif,-85.99,0.12,4842.281503956503,1345,0.9786375464684014,100.0,100.0,86.09665427509293,0.0,0
