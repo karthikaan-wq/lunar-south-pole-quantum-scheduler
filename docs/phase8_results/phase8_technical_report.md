@@ -3,7 +3,7 @@
 
 **Project:** Lunar South Pole Quantum Scheduler
 **Phase:** 8
-**Status:** Implementation, integration, scientific analysis, dedicated testing, and documentation completed; final regression and follow-up Git commit pending
+**Status:** Implementation, integration, scientific analysis, testing, documentation, and GitHub publication completed
 
 ## 1. Objective
 
