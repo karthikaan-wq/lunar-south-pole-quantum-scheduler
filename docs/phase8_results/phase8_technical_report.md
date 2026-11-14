@@ -1,9 +1,9 @@
+
 # Phase 8 — Terrain-Aware Earth Visibility Modelling
 
 **Project:** Lunar South Pole Quantum Scheduler
 **Phase:** 8
-**Status:** Implementation, integration, scientific analysis, testing, and documentation completed
-**Simulation period:** 14 November 2026 00:00 UTC – 12 December 2026 00:00 UTC
+**Status:** Implementation, integration, scientific analysis, dedicated testing, and documentation completed; final regression and follow-up Git commit pending
 
 ## 1. Objective
 
@@ -87,7 +87,20 @@ Its `earth_visibility_for_site(...)` workflow:
 6. Summarizes the visibility results.
 7. Returns the site, terrain, simulation settings, Earth-track summary, visibility summary, and individual samples.
 
-The observer height is kept separate from the DEM-derived terrain elevation. For the study locations, the observer heights were taken from the interpolated DEM elevations.
+#### Observer-height consistency correction
+
+The observer height used for Earth geometry accounts for both the DEM-derived terrain elevation and the antenna height above the lunar surface.
+
+For every study location:
+
+- `height_m` represents the interpolated DEM terrain elevation.
+- `antenna_height_m` represents the antenna height above the terrain surface.
+- The Earth-track calculation uses `height_m + antenna_height_m` as the observer elevation.
+- The terrain horizon calculation also accounts for the same antenna height above the DEM surface.
+
+This ensures that the Earth geometry and terrain horizon calculations use a consistent observer position.
+
+The DEM terrain elevation remains separately recorded as the site's ground elevation. The antenna height is not added twice.
 
 ### 2.4 `backend/visibility/routes.py` and `backend/main.py`
 
@@ -172,9 +185,11 @@ The final simulation timestamp is 2026-12-12 00:00 UTC.
 
 ### 4.2 Results
 
+The following values represent the corrected three-site run after ensuring that Earth geometry and terrain-horizon calculations use the same observer elevation.
+
 | Measurement | Floor candidate | Rim candidate | Malapert |
 |---|---:|---:|---:|
-| Mean visible fraction | 0.000000 | 0.028810 | 0.978638 |
+| Mean visible fraction | 0.0000 | 0.0288 | 0.9786 |
 | Any part visible | 0.00% | 13.01% | 100.00% |
 | Centre visible | 0.00% | 0.00% | 100.00% |
 | Fully visible | 0.00% | 0.00% | 86.10% |
@@ -205,7 +220,9 @@ Among these three study locations, Malapert had the highest modelled Earth visib
 
 ## 5. Sensitivity analysis
 
-A sensitivity analysis was performed at Malapert Massif to evaluate how the results changed when the horizon angular spacing and number of Earth-disc sample points were varied.
+Sensitivity analysis was performed at both Malapert Massif and the Shackleton Rim Candidate to evaluate how the results changed when the horizon angular spacing and number of Earth-disc sample points were varied.
+
+### 5.1 Malapert Massif sensitivity analysis
 
 The analysis used a 28-day period with hourly sampling, producing 673 samples per configuration.
 
@@ -217,7 +234,7 @@ The analysis used a 28-day period with hourly sampling, producing 673 samples pe
 | D | 0.5° | 200 | 0.978878 | 100% | 86.181% |
 | E | 0.5° | 1000 | 0.978790 | 100% | 86.181% |
 
-### 5.1 Difference from baseline
+#### Difference from baseline
 
 Differences below are expressed in percentage points.
 
@@ -232,18 +249,39 @@ The tested configurations produced very similar mean visibility values and ident
 
 The baseline of 0.5° horizon spacing and 400 disc points provides a reasonable balance between computational cost and numerical stability for this study.
 
-This sensitivity analysis evaluates changes in the selected numerical settings. It does not establish absolute accuracy of the DEM, terrain model, or physical environment.
+### 5.2 Shackleton Rim Candidate sensitivity analysis
+
+A second sensitivity analysis was performed at the Shackleton Rim Candidate to verify numerical stability at a location with intermittent partial Earth visibility.
+
+The analysis used the same 28-day period, from 2026-11-14 to 2026-12-12, with hourly sampling. Each configuration produced 673 samples. All configurations reported zero incomplete-terrain samples.
+
+| Configuration | Horizon step | Disc points | Mean visible fraction | Any part visible | Fully visible |
+|---|---:|---:|---:|---:|---:|
+| A | 1.0° | 400 | 0.028826 | 13.076% | 0% |
+| B — Baseline | 0.5° | 400 | 0.028819 | 13.076% | 0% |
+| C | 0.25° | 400 | 0.028819 | 13.076% | 0% |
+| D | 0.5° | 200 | 0.028975 | 12.779% | 0% |
+| E | 0.5° | 1000 | 0.028731 | 13.076% | 0% |
+
+The 1.0°, 0.5°, and 0.25° horizon configurations produced nearly identical mean visible fractions and identical percentages of samples with some part of Earth's disc visible. Increasing the horizon resolution beyond 0.5° did not materially change the reported results.
+
+Changing the disc sampling from 400 to 200 points produced a small difference in the percentage of samples with partial visibility. The 1,000-point configuration remained close to the 400-point baseline.
+
+These results support retaining **0.5° horizon spacing and 400 Earth-disc points** as the Phase 8 baseline for this study. They demonstrate numerical stability across the tested configurations, not absolute physical accuracy.
 
 ## 6. Testing and verification
 
 ### 6.1 Dedicated Phase 8 tests
 
+The dedicated Phase 8 tests were run after adding the exact circle-segment validation and API integration tests.
+
 | Test module | Tests passed |
 |---|---:|
-| `tests/test_phase8_disc.py` | 17 |
+| `tests/test_phase8_disc.py` | 18 |
 | `tests/test_phase8_earth_visibility.py` | 15 |
 | `tests/test_phase8_with_terrain.py` | 4 |
-| **Total** | **36** |
+| `tests/test_phase8_api.py` | 4 |
+| **Total** | **41** |
 
 The tests cover:
 
@@ -251,29 +289,40 @@ The tests cover:
 - Horizon interpolation and azimuth wraparound.
 - Non-divisor azimuth spacing.
 - Visibility fraction calculations.
+- An exact circle-segment formula comparison for partial-disc visibility.
 - Complete and incomplete terrain coverage.
 - Summary statistics.
 - Synthetic terrain obstruction.
 - Visibility under different Earth elevations.
 - Visibility away from a terrain obstruction.
+- API rejection of invalid latitude.
+- API rejection of invalid timestamps.
+- Successful Malapert visibility API response.
+- Incomplete terrain reporting near the DEM coverage boundary.
+
+The four API tests include two validation tests and two real-data integration tests. The real-data tests require the NASA LOLA DEM and the necessary SPICE kernels.
 
 ### 6.2 Full project regression
 
-Command:
-
-`python -m pytest -v`
-
-Result:
+The earlier full-project regression result was:
 
 **126 passed, 1 warning**
 
-There were no test failures.
+There were no failures in that earlier run.
 
 The warning was an existing Starlette deprecation warning concerning use of `httpx` with `starlette.testclient`, recommending `httpx2`. It did not cause test failures.
 
+**Final regression status:** A new full-project regression run is required after the latest reviewer-requested API tests and observer-height correction. The earlier 126-test result must not be treated as the final count for the updated codebase.
+
+The final command is:
+
+`python -m pytest -v`
+
+The final result should be recorded after that run.
+
 ### 6.3 Additional verification
 
-The following checks were completed:
+The following checks were completed during Phase 8 development:
 
 - Python compilation of the visibility package.
 - Python compilation of Phase 8 scripts.
@@ -283,6 +332,8 @@ The following checks were completed:
 - End-to-end API smoke test.
 
 The end-to-end API smoke test returned HTTP 200 for Malapert, with 25 samples for a one-day hourly request, 720/720 complete terrain directions, mean visible fraction 1.0, and zero incomplete-terrain samples.
+
+The dedicated API test suite also passed all four tests.
 
 ## 7. Generated outputs
 
@@ -295,8 +346,9 @@ The following files were generated under `docs/phase8_results/`:
 | `malapert_massif_visibility.csv` | Time-series visibility for Malapert |
 | `phase8_all_sites_visibility.csv` | Combined time-series dataset |
 | `phase8_visibility_summary.csv` | Summary statistics for all sites |
-| `phase8_visibility_timeline.png` | Three-site visibility timeline |
-| `phase8_sensitivity_results.csv` | Numerical sensitivity analysis |
+| `phase8_visibility_timeline_corrected.png` | Corrected three-site visibility timeline |
+| `phase8_sensitivity_results.csv` | Malapert numerical sensitivity analysis |
+| `phase8_shackleton_rim_sensitivity_results.csv` | Shackleton Rim Candidate numerical sensitivity analysis |
 | `phase8_technical_report.md` | This technical report |
 
 Supporting scripts:
@@ -326,7 +378,7 @@ The following limitations apply to the current implementation:
 7. **Incomplete terrain:** Incomplete directions are flagged. Their provisional visibility estimates must not be interpreted as confirmed clear lines of sight.
 8. **Simulation period:** The principal results cover one specific 28-day interval. They do not establish long-term or seasonal availability.
 9. **Candidate locations:** The Shackleton floor and rim coordinates are provisional DEM-based candidates, not independently confirmed geological classifications.
-10. **Observer height:** Observer height is distinct from the terrain elevation obtained from the DEM. The study uses the DEM-derived site elevation for the selected locations.
+10. **Observer height:** Earth geometry and terrain-horizon calculations use a consistent observer elevation: DEM-derived site elevation plus antenna height. The ground elevation and antenna height are retained separately in the site metadata.
 
 ## 9. Conclusion
 
@@ -340,7 +392,7 @@ The three-site study showed substantially different visibility behaviour:
 - The Shackleton Rim Candidate had intermittent partial visibility.
 - Malapert Massif maintained some Earth-disc visibility throughout the selected period and had the highest mean visible fraction of the three sites.
 
-The sensitivity analysis showed that the selected baseline settings produced stable results across the tested numerical configurations.
+The sensitivity analyses at Malapert and the Shackleton Rim Candidate support the selected baseline of 0.5° horizon spacing and 400 Earth-disc points for the tested configurations.
 
 Phase 8 delivers:
 
@@ -349,8 +401,33 @@ Phase 8 delivers:
 - Integration with SPICE-based Earth tracking and NASA LOLA terrain.
 - A new FastAPI visibility endpoint.
 - Three-site 28-day simulation datasets.
-- A visibility timeline and sensitivity analysis.
-- Dedicated tests and full regression verification.
+- A corrected visibility timeline.
+- Two numerical sensitivity analyses.
+- Dedicated tests, including API integration and exact circle-segment validation.
 - A technical report documenting the implementation and limitations.
 
-**Phase 8 implementation, integration, analysis, testing, and documentation are complete.** Git commit and GitHub publication are the remaining project-finalization steps.
+**Phase 8 implementation, integration, scientific analysis, dedicated testing, and documentation are complete.**
+
+## 10. Git and project finalization
+
+The main Phase 8 implementation was previously committed and pushed to the GitHub repository.
+
+The previously confirmed latest pushed short commit hash was:
+
+`ede4a62`
+
+The repository was reported clean and synchronized with `origin/main` after that push.
+
+The reviewer-requested follow-up work includes:
+
+- Consistent observer-height handling.
+- Exact circle-segment validation.
+- Phase 8 API integration tests.
+- Shackleton Rim Candidate sensitivity analysis.
+- Updated Phase 7 and Phase 8 documentation.
+
+These follow-up changes require a final full-project regression run, followed by a separate Git commit and push.
+
+The final follow-up commit hash, commit message, full regression result, and clean Git status must be recorded here after those operations are completed.
+
+**Phase 8 is technically complete. Final follow-up verification and Git publication remain to be recorded.**

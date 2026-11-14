@@ -1,5 +1,7 @@
 import numpy as np
 import pytest
+from backend.visibility.earth_visibility import visibility_from_samples
+
 
 from backend.terrain import horizon
 from backend.visibility.disc_visibility import (
@@ -300,3 +302,40 @@ def test_horizon_rejects_mismatched_arrays():
             np.arange(0.0, 360.0, 45.0),
             np.zeros(7),
         )
+
+def test_visible_fraction_matches_exact_circle_segment_formula():
+    horizon_elevation = 0.02
+    centre_elevation = 0.0
+    angular_radius = 0.1
+
+    horizon = make_horizon(
+        step_deg=45.0,
+        value=horizon_elevation,
+    )
+
+    result = visibility_from_samples(
+        samples=[
+            {
+                "utc": "2026-11-14T00:00:00Z",
+                "azimuth_deg": 90.0,
+                "elevation_deg": centre_elevation,
+                "angular_radius_deg": angular_radius,
+            }
+        ],
+        horizon=horizon,
+        n_points=400,
+    )
+
+    x = (
+        horizon_elevation - centre_elevation
+    ) / angular_radius
+
+    expected_fraction = (
+        np.arccos(x)
+        - x * np.sqrt(1.0 - x ** 2)
+    ) / np.pi
+
+    assert result[0]["visible_fraction"] == pytest.approx(
+        expected_fraction,
+        abs=0.04,
+    )

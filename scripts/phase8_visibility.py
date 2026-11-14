@@ -234,7 +234,7 @@ def write_timeline_plot(all_results):
     """Plot visible Earth-disc fraction for all three sites."""
 
     output_path = (
-        OUTPUT_DIR / "phase8_visibility_timeline.png"
+        OUTPUT_DIR / "phase8_visibility_timeline_corrected.png"
     )
 
     plt.figure(figsize=(14, 7))

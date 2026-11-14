@@ -20,10 +20,10 @@ from scripts.phase8_visibility import (
 # PHASE 8 — NUMERICAL SENSITIVITY ANALYSIS
 # ============================================================
 
-SITE_NAME = "Malapert Massif"
+SITE_NAME = "Shackleton Rim Candidate"
 
-LATITUDE_DEG = -85.99
-LONGITUDE_DEG = 0.12
+LATITUDE_DEG = -89.67869
+LONGITUDE_DEG = -163.05292
 
 START_UTC = "2026-11-14T00:00:00Z"
 DURATION_DAYS = 28.0
@@ -154,7 +154,7 @@ def main():
     ]
 
     output_path = (
-        OUTPUT_DIR / "phase8_sensitivity_results.csv"
+       OUTPUT_DIR / "phase8_shackleton_rim_sensitivity_results.csv"
     )
 
     fields = [

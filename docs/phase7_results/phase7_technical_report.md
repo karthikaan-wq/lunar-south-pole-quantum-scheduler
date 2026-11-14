@@ -770,8 +770,17 @@ This prevents incomplete DEM coverage from being mistaken for a fully verified h
 
 
 
-### Shackleton crater centre
+### Original Shackleton test point (inner wall)
 
+
+**Site interpretation correction:** The original coordinate
+(-89.9°, 129.78°E) was initially described as the Shackleton
+crater centre. Subsequent DEM-based site analysis in Phase 8
+showed that this coordinate is on an inner crater wall, not
+representative of the crater floor. The Phase 7 elevation
+above (-361.33 m) is retained as the original nearest-pixel
+measurement. Phase 8 separately identified a floor candidate
+and a rim candidate for more meaningful site comparisons.
 
 
 Parameters:
@@ -1418,7 +1427,7 @@ The implementation combines a South Polar Stereographic projection, synthetic te
 
 
 
-Real terrain tests at Shackleton crater centre and Malapert Massif demonstrate that the system can calculate horizon profiles from actual lunar elevation data.
+Real terrain tests at the original Shackleton inner-wall test point and Malapert Massif demonstrate that the system can calculate horizon profiles from actual lunar elevation data. Subsequent Phase 8 analysis identified separate Shackleton floor and rim candidates, correcting the original site's interpretation without changing the Phase 7 test measurements.
 
 
 
@@ -1431,3 +1440,33 @@ The regression suite, documentation review, final Git verification, commit, and 
 
 
 **Phase 7 status: COMPLETE ? implementation, testing, documentation, Git verification, commit, and GitHub publication are complete.**
+
+
+## Phase 8 — Final lunar site reference table
+
+The following three locations were selected for terrain-aware Earth visibility analysis using the NASA LOLA 80 m DEM.
+
+| Site | Latitude | Longitude | DEM elevation |
+|---|---:|---:|---:|
+| Shackleton Floor Candidate | -89.73391° | 122.03549°E | -2843.63 m |
+| Shackleton Rim Candidate | -89.67869° | -163.05292° | +1703.42 m |
+| Malapert Massif | -85.99° | 0.12°E | +4842.28 m |
+
+**Site-selection notes:**
+
+- The original Phase 7 test point (-89.9°, 129.78°E) was found to lie on an inner crater wall, rather than representing the crater floor.
+- The Shackleton floor and rim coordinates are DEM-derived candidate locations. They are not independently confirmed geological reference points.
+- Elevations are DEM-derived site measurements and should not be confused with antenna height.
+- The antenna height used in the Phase 8 visibility analysis is 2 m above the terrain surface.
+
+**Phase 8 analysis configuration:**
+
+- Observation period: 28 days, 14 November–12 December 2026.
+- Time interval: 30 minutes.
+- Maximum terrain horizon range: 40 km.
+- Horizon azimuth spacing: 0.5°.
+- Earth-disc sampling points: 400.
+- Terrain source: NASA LOLA 80 m DEM.
+- Observer height: terrain elevation plus 2 m antenna height.
+
+**Important limitation:** The visibility results describe the selected 28-day observation period. They do not establish permanent visibility, permanent shadow, or long-term communication availability.

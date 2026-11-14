@@ -34,11 +34,11 @@ def earth_visibility_for_site(
     Incomplete terrain coverage is preserved and flagged.
     """
 
-    # 1. Calculate Earth's apparent geometry over time.
+      # 1. Calculate Earth's apparent geometry over time.
     track = earth_track(
         lat_deg=lat_deg,
         lon_deg=lon_deg,
-        height_m=height_m,
+        height_m=height_m + antenna_height_m,
         start_utc=start_utc,
         duration_days=duration_days,
         step_minutes=step_minutes,
