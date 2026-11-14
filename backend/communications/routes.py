@@ -1,5 +1,10 @@
-
+﻿
 from fastapi import APIRouter, HTTPException, Query
+from pydantic import BaseModel, Field
+from typing import Literal
+
+from .site_surface_links import surface_links_for_assets
+from .surface_links import SurfaceLinkSettings
 
 from backend.physics.kernels import KernelsMissing
 from backend.physics.time_system import parse_utc
@@ -11,11 +16,86 @@ from .site_windows import windows_for_site
 from .windows import WindowSettings
 
 
+
+class SurfaceAssetRequest(BaseModel):
+    name: str = Field(min_length=1, max_length=80)
+    type: Literal["lander", "rover"]
+    latitude_deg: float = Field(ge=-90.0, le=0.0)
+    longitude_deg: float = Field(ge=-180.0, le=180.0)
+    antenna_height_m: float | None = Field(default=None, ge=0.0, le=100.0)
+
+
+class SurfaceLinksRequest(BaseModel):
+    assets: list[SurfaceAssetRequest] = Field(min_length=2, max_length=20)
+    frequency_hz: float = Field(default=401.5e6, gt=0.0, le=10e9)
+    max_range_m: float = Field(default=10000.0, gt=0.0, le=100000.0)
+    min_clearance_m: float = Field(default=0.0, ge=0.0, le=1000.0)
+    min_fresnel_ratio: float = Field(default=0.0, ge=0.0, le=2.0)
+    step_m: float = Field(default=40.0, gt=0.0, le=1000.0)
+    terrain_margin_m: float = Field(default=3000.0, ge=0.0, le=50000.0)
+
 router = APIRouter(
     prefix="/api/communications",
     tags=["Phase 9/10 - Direct-to-Earth Communications"],
 )
 
+
+@router.post("/surface-links")
+def surface_surface_links(request: SurfaceLinksRequest):
+    """Evaluate static terrain-aware radio links between lunar surface assets."""
+
+    assets = [asset.model_dump(exclude_none=True) for asset in request.assets]
+    names = [asset["name"].strip() for asset in assets]
+
+    if len(names) != len(set(names)):
+        raise HTTPException(
+            status_code=422,
+            detail="Asset names must be unique.",
+        )
+
+    for asset, name in zip(assets, names):
+        asset["name"] = name
+
+    try:
+        settings = SurfaceLinkSettings(
+            frequency_hz=request.frequency_hz,
+            max_range_m=request.max_range_m,
+            min_clearance_m=request.min_clearance_m,
+            min_fresnel_ratio=request.min_fresnel_ratio,
+            step_m=request.step_m,
+        )
+
+        results = surface_links_for_assets(
+            assets,
+            settings=settings,
+            margin_m=request.terrain_margin_m,
+        )
+
+        links = [
+            {"asset_a": pair[0], "asset_b": pair[1], **result}
+            for pair, result in results.items()
+        ]
+
+        return {
+            "source": "NASA LOLA DEM + Phase 12 Surface Link Model",
+            "asset_count": len(assets),
+            "link_count": len(links),
+            "settings": {
+                "frequency_hz": settings.frequency_hz,
+                "max_range_m": settings.max_range_m,
+                "min_clearance_m": settings.min_clearance_m,
+                "min_fresnel_ratio": settings.min_fresnel_ratio,
+                "step_m": settings.step_m,
+                "terrain_margin_m": request.terrain_margin_m,
+            },
+            "links": links,
+        }
+
+    except FileNotFoundError as error:
+        raise HTTPException(status_code=503, detail=str(error))
+
+    except ValueError as error:
+        raise HTTPException(status_code=422, detail=str(error))
 
 @router.get("/direct-to-earth")
 def direct_to_earth(

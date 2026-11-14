@@ -1,0 +1,309 @@
+{
+  "project": "Lunar South Pole Quantum Scheduler",
+  "phase": 12,
+  "title": "Rover-to-Lander Surface Links and End-to-End Opportunities",
+  "simulation_assumptions": {
+    "start_utc": "2026-11-15T00:00:00Z",
+    "duration_days": 14.0,
+    "energy_sampling_minutes": 30.0,
+    "earth_link_sampling_minutes": 5.0,
+    "energy_horizon_range_m": 100000.0,
+    "earth_horizon_range_m": 40000.0,
+    "earth_horizon_azimuth_step_deg": 0.5,
+    "earth_disc_points": 400,
+    "surface_frequency_hz": 401500000.0,
+    "surface_max_range_m": 10000.0,
+    "surface_path_step_m": 40.0,
+    "surface_min_clearance_m": 0.0,
+    "surface_min_fresnel_ratio": 0.0,
+    "maximum_forwarding_wait_hours": 12.0,
+    "minimum_forwarding_duration_minutes": 5.0,
+    "dem": "NASA LOLA 80 m DEM",
+    "note": "Power, antenna and radio parameters are engineering simulation assumptions, not verified flight hardware specifications."
+  },
+  "assets": {
+    "lander": {
+      "name": "Malapert_Lander",
+      "type": "lander",
+      "latitude_deg": -85.99,
+      "longitude_deg": 0.12,
+      "antenna_height_m": 3.0
+    },
+    "rover": {
+      "name": "Rover_01",
+      "type": "rover",
+      "latitude_deg": -86.0,
+      "longitude_deg": 0.12,
+      "antenna_height_m": 1.5
+    }
+  },
+  "surface_link": {
+    "asset_a": "Malapert_Lander",
+    "asset_b": "Rover_01",
+    "distance_m": 303.2335048206631,
+    "slant_range_m": 305.2643161825093,
+    "line_of_sight": false,
+    "range_ok": true,
+    "fresnel_ok": false,
+    "min_clearance_m": -6.434498012298718,
+    "min_clearance_at_m": 113.71256430774866,
+    "fresnel_ratio_min": -0.8832890753748925,
+    "elevation_of_b_from_a_deg": -5.06041573465225,
+    "elevation_of_a_from_b_deg": 5.050415734659856,
+    "data_complete": true,
+    "usable": false
+  },
+  "energy": {
+    "lander": {
+      "site": {
+        "latitude_deg": -85.99,
+        "longitude_deg": 0.12,
+        "terrain_elevation_m": 4842.281503956502,
+        "observer_height_m": 4845.281503956502
+      },
+      "settings": {
+        "start_utc": "2026-11-15T00:00:00Z",
+        "end_utc": "2026-11-29T00:00:00Z",
+        "duration_days": 14.0,
+        "step_minutes": 30.0,
+        "sunlit_threshold": 0.5,
+        "max_range_m": 100000.0,
+        "azimuth_step_deg": 0.25,
+        "disc_points": 400
+      },
+      "terrain": {
+        "dataset": "NASA LOLA 80 m DEM",
+        "dataset_resolution_m": 80.0,
+        "terrain_elevation_m": 4842.281503956502,
+        "panel_height_m": 3.0,
+        "max_range_m": 100000.0,
+        "azimuth_step_deg": 0.25,
+        "complete_directions": 1440,
+        "total_directions": 1440,
+        "all_directions_complete": true
+      },
+      "panel": {
+        "kind": "tracking",
+        "area_m2": 3.0,
+        "efficiency": 0.28,
+        "dust_loss": 0.05,
+        "degradation": 0.0,
+        "panel_height_m": 3.0,
+        "normal_elevation_deg": 0.0,
+        "normal_azimuth_deg": 0.0
+      },
+      "battery": {
+        "capacity_wh": 2000.0,
+        "initial_soc": 0.8,
+        "minimum_soc": 0.2,
+        "final_soc": 1.0,
+        "minimum_observed_soc": 0.0,
+        "total_stored_wh": 1999.9999999999998,
+        "total_drawn_wh": 1520.0000000000005,
+        "total_wasted_wh": 254623.48637049034,
+        "total_unmet_load_wh": 3698.123525049269,
+        "depleted": true,
+        "below_minimum": true
+      },
+      "load": {
+        "base_load_w": 60.0
+      },
+      "summary": {
+        "sample_count": 673,
+        "sunlit_sample_percent": 73.10549777117384,
+        "sunlit_hours": 245.5,
+        "total_generated_wh": 271670.6260033358,
+        "minimum_sun_fraction": 0.0,
+        "maximum_sun_fraction": 1.0,
+        "mean_sun_fraction": 0.7316196136701337,
+        "complete_horizon_samples": 673
+      },
+      "sunlight_window_count": 1,
+      "warning_count": 2,
+      "warnings": [
+        "Battery state of charge fell below the configured minimum.",
+        "Battery depletion occurred; unmet load is reported."
+      ],
+      "power_eligible_window_count": 2
+    },
+    "rover": {
+      "site": {
+        "latitude_deg": -86.0,
+        "longitude_deg": 0.12,
+        "terrain_elevation_m": 4816.881853986552,
+        "observer_height_m": 4818.381853986552
+      },
+      "settings": {
+        "start_utc": "2026-11-15T00:00:00Z",
+        "end_utc": "2026-11-29T00:00:00Z",
+        "duration_days": 14.0,
+        "step_minutes": 30.0,
+        "sunlit_threshold": 0.5,
+        "max_range_m": 100000.0,
+        "azimuth_step_deg": 0.25,
+        "disc_points": 400
+      },
+      "terrain": {
+        "dataset": "NASA LOLA 80 m DEM",
+        "dataset_resolution_m": 80.0,
+        "terrain_elevation_m": 4816.881853986552,
+        "panel_height_m": 1.5,
+        "max_range_m": 100000.0,
+        "azimuth_step_deg": 0.25,
+        "complete_directions": 1440,
+        "total_directions": 1440,
+        "all_directions_complete": true
+      },
+      "panel": {
+        "kind": "tracking",
+        "area_m2": 0.8,
+        "efficiency": 0.28,
+        "dust_loss": 0.05,
+        "degradation": 0.0,
+        "panel_height_m": 1.5,
+        "normal_elevation_deg": 0.0,
+        "normal_azimuth_deg": 0.0
+      },
+      "battery": {
+        "capacity_wh": 400.0,
+        "initial_soc": 0.8,
+        "minimum_soc": 0.2,
+        "final_soc": 1.0,
+        "minimum_observed_soc": 0.0,
+        "total_stored_wh": 400.0,
+        "total_drawn_wh": 303.9999999999998,
+        "total_wasted_wh": 9539.885672226976,
+        "total_unmet_load_wh": 5561.239646663449,
+        "depleted": true,
+        "below_minimum": true
+      },
+      "load": {
+        "base_load_w": 20.0
+      },
+      "summary": {
+        "sample_count": 673,
+        "sunlit_sample_percent": 10.99554234769688,
+        "sunlit_hours": 36.5,
+        "total_generated_wh": 10815.698657142475,
+        "minimum_sun_fraction": 0.0,
+        "maximum_sun_fraction": 1.0,
+        "mean_sun_fraction": 0.1101560178306092,
+        "complete_horizon_samples": 673
+      },
+      "sunlight_window_count": 1,
+      "warning_count": 2,
+      "warnings": [
+        "Battery state of charge fell below the configured minimum.",
+        "Battery depletion occurred; unmet load is reported."
+      ],
+      "power_eligible_window_count": 2
+    }
+  },
+  "earth_link": {
+    "source": "SPICE + NASA LOLA DEM + Phase 9 Direct-to-Earth Link Model + Phase 10 Refined Windows",
+    "site": {
+      "latitude_deg": -85.99,
+      "longitude_deg": 0.12,
+      "height_m": 4842.281503956502,
+      "terrain_elevation_m": 4842.281503956503,
+      "antenna_height_m": 3.0
+    },
+    "settings": {
+      "start_utc": "2026-11-15T00:00:00.000",
+      "end_utc": "2026-11-29T00:00:00.000",
+      "duration_days": 14.0,
+      "step_minutes": 5.0,
+      "max_range_m": 40000.0,
+      "azimuth_step_deg": 0.5,
+      "terrain_sample_step_m": 80.0,
+      "disc_points": 400,
+      "window_resolution_s": 60.0,
+      "max_gap_s": 600.0,
+      "min_duration_s": 1800.0,
+      "antenna": {
+        "kind": "steerable",
+        "min_elevation_deg": -10.0,
+        "max_elevation_deg": 90.0
+      },
+      "link_constraints": {
+        "min_visible_fraction": 0.5,
+        "min_clearance_deg": 0.5,
+        "require_complete_terrain": true,
+        "sun_exclusion_deg": 3.0,
+        "sun_exclusion_only_if_sun_in_view": true
+      }
+    },
+    "terrain": {
+      "dataset": "NASA LOLA 80 m DEM",
+      "dataset_resolution_m": 80.0,
+      "complete_directions": 720,
+      "total_directions": 720,
+      "all_directions_complete": true
+    },
+    "link_summary": {
+      "total_samples": 4033,
+      "available_samples": 4033,
+      "unavailable_samples": 0,
+      "availability_percent": 100.0
+    },
+    "summary": {
+      "window_count": 1,
+      "rejected_count": 0,
+      "total_available_s": 1209600.0,
+      "total_available_hours": 336.0,
+      "longest_window_s": 1209600.0,
+      "windows_touching_period_edges": 1,
+      "available_percentage": 100.0
+    },
+    "windows": [
+      {
+        "window_id": "window_001",
+        "start_s": 1794700800.0,
+        "end_s": 1795910400.0,
+        "start_utc": "2026-11-15T00:00:00Z",
+        "end_utc": "2026-11-29T00:00:00Z",
+        "duration_s": 1209600.0,
+        "available_s": 1209600.0,
+        "bridged_gap_s": 0,
+        "bridged_gaps": [],
+        "starts_before_period": true,
+        "ends_after_period": true,
+        "clipped": true,
+        "limiting_checks": [],
+        "stats": {
+          "visible_fraction": {
+            "mean": 1.0,
+            "min": 1.0,
+            "max": 1.0
+          },
+          "clearance_deg": {
+            "mean": 10.04784800204969,
+            "min": 3.548862249341496,
+            "max": 13.325472692944754
+          },
+          "sun_earth_separation_deg": {
+            "mean": 52.187427234012716,
+            "min": 4.674023078381377,
+            "max": 117.09898559417995
+          }
+        }
+      }
+    ],
+    "rejected": []
+  },
+  "end_to_end_opportunities": {
+    "surface_link_usable": false,
+    "rover_power_window_count": 2,
+    "lander_power_window_count": 2,
+    "common_power_window_count": 2,
+    "uplink_window_count": 0,
+    "uplink_windows": [],
+    "forwarding_options": [],
+    "settings": {
+      "max_wait_s": 43200.0,
+      "min_forward_s": 300.0,
+      "power_eligibility_rule": "battery_soc > 0, below_minimum_soc is false, and preceding_interval_unmet_load_wh == 0",
+      "power_rule_is_scheduling_assumption": true
+    }
+  }
+}

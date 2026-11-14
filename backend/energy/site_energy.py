@@ -332,6 +332,9 @@ def energy_timeline_for_site(
             "solar_power_w": float(generated_power_w[i]),
             "battery_soc": float(soc[i]),
             "below_minimum_soc": bool(below_minimum[i]),
+            "unmet_load_wh_since_previous_sample": float(
+                0.0 if i == 0 else battery["unmet_load_wh"][i - 1]
+            ),
             "coverage_complete": bool(coverage_complete[i]),
         })
 
