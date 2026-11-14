@@ -1,3 +1,4 @@
+
 from pathlib import Path
 
 from fastapi import FastAPI, HTTPException, Query
@@ -20,8 +21,9 @@ from backend.physics.earth_geometry import (
 
 from backend.terrain.dem_loader import load_dem_terrain
 from backend.terrain.horizon import horizon_profile
-from backend.visibility.routes import router as visibility_router
 
+from backend.visibility.routes import router as visibility_router
+from backend.communications.routes import router as communications_router
 
 from backend.store import (
     new_id,
@@ -39,6 +41,7 @@ app = FastAPI(
 )
 
 app.include_router(visibility_router)
+app.include_router(communications_router)
 
 app.add_middleware(
     CORSMiddleware,
@@ -474,7 +477,6 @@ def terrain_horizon(
             status_code=422,
             detail=str(error),
         )
-
 
 
 # Serve the frontend after registering all API routes.

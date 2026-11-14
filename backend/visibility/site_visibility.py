@@ -21,6 +21,7 @@ def earth_visibility_for_site(
     max_range_m=40000.0,
     azimuth_step_deg=0.5,
     n_disc_points=400,
+    return_horizon_model=False,
 ):
     """
     Calculate Earth's terrain-aware apparent-disc visibility
@@ -30,11 +31,21 @@ def earth_visibility_for_site(
         Phase 6: Earth apparent geometry and time tracking.
         Phase 7: NASA LOLA terrain horizon.
         Phase 8: Apparent Earth-disc visibility.
+        Phase 9: Optional reuse of the internal HorizonModel.
 
     Incomplete terrain coverage is preserved and flagged.
+
+    By default, returns the original Phase 8 result dictionary.
+
+    When return_horizon_model=True, returns a tuple:
+        (result_dictionary, horizon_model)
+
+    The HorizonModel is intended for internal Python use.
+    It should not be exposed directly through a JSON API.
     """
 
-      # 1. Calculate Earth's apparent geometry over time.
+    # 1. Calculate Earth's apparent geometry over time.
+    # The observer height includes the antenna height.
     track = earth_track(
         lat_deg=lat_deg,
         lon_deg=lon_deg,
@@ -89,7 +100,8 @@ def earth_visibility_for_site(
         len(profile["azimuth_deg"])
     )
 
-    return {
+    # 7. Build the standard Phase 8 result.
+    result = {
         "source": "SPICE + NASA LOLA DEM",
 
         "site": {
@@ -131,3 +143,9 @@ def earth_visibility_for_site(
 
         "samples": visibility_samples,
     }
+
+    # 8. Optionally return the internal horizon model for Phase 9.
+    if return_horizon_model:
+        return result, horizon
+
+    return result
