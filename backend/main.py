@@ -24,6 +24,7 @@ from backend.terrain.horizon import horizon_profile
 
 from backend.visibility.routes import router as visibility_router
 from backend.communications.routes import router as communications_router
+from backend.energy.routes import router as energy_router
 
 from backend.store import (
     new_id,
@@ -42,6 +43,7 @@ app = FastAPI(
 
 app.include_router(visibility_router)
 app.include_router(communications_router)
+app.include_router(energy_router)
 
 app.add_middleware(
     CORSMiddleware,

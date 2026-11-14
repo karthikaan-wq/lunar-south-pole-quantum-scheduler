@@ -1,12 +1,15 @@
 
 from __future__ import annotations
 
+import math
 from typing import Sequence
 
+from .coordinates import MOON_REFERENCE_RADIUS_KM
 from .earth_geometry import (
     earth_from_lander_moon_fixed,
     sample_from_vector,
 )
+from .kernels import load_kernels
 from .time_system import (
     et_to_utc,
     parse_utc,
@@ -30,7 +33,9 @@ def earth_samples_at(
         lat_deg: Lunar latitude in degrees.
         lon_deg: East longitude in degrees.
         height_m: Observer height above the lunar reference sphere,
-                  in metres. Include antenna height when appropriate.
+                  in metres. Include panel or antenna height when
+                  appropriate. Negative values are valid for sites
+                  below the reference sphere.
         time_strings: Sequence of ISO-format UTC timestamps.
 
     Returns:
@@ -53,8 +58,19 @@ def earth_samples_at(
     if not -360.0 <= float(lon_deg) <= 360.0:
         raise ValueError("Longitude must be between -360 and 360 degrees.")
 
-    if float(height_m) < 0.0:
-        raise ValueError("Observer height cannot be negative.")
+    height_m = float(height_m)
+
+    if not math.isfinite(height_m):
+        raise ValueError("Observer height must be finite.")
+
+    observer_radius_km = (
+        MOON_REFERENCE_RADIUS_KM + height_m / 1000.0
+    )
+
+    if observer_radius_km <= 0.0:
+        raise ValueError(
+            "Observer position must remain outside the Moon's centre."
+        )
 
     if not time_strings:
         return []
@@ -63,7 +79,9 @@ def earth_samples_at(
 
     for timestamp in time_strings:
         if not isinstance(timestamp, str) or not timestamp.strip():
-            raise ValueError("Every timestamp must be a non-empty string.")
+            raise ValueError(
+                "Every timestamp must be a non-empty string."
+            )
 
         # Convert the input UTC timestamp into SPICE Ephemeris Time.
         moment = parse_utc(timestamp)
@@ -73,7 +91,7 @@ def earth_samples_at(
         earth_vector, distance_km, _ = earth_from_lander_moon_fixed(
             lat_deg=float(lat_deg),
             lon_deg=float(lon_deg),
-            height_m=float(height_m),
+            height_m=height_m,
             et=et,
             abcorr="NONE",
         )
